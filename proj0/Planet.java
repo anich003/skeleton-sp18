@@ -70,4 +70,15 @@ public class Planet {
         }
         return Fy;
     }
+
+    public void update (double timestep, double xForce, double yForce) {
+        double ax = xForce / mass;
+        double ay = yForce / mass;
+
+        xxVel += timestep * ax;
+        yyVel += timestep * ay;
+
+        xxPos += timestep * xxVel;
+        yyPos += timestep * yyVel;
+    }
 }
