@@ -81,4 +81,8 @@ public class Planet {
         xxPos += timestep * xxVel;
         yyPos += timestep * yyVel;
     }
+
+    public void draw () {
+        StdDraw.picture(xxPos, yyPos, "images/" + imgFileName);
+    }
 }
