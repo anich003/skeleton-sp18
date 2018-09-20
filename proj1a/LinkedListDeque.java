@@ -111,9 +111,31 @@ public class LinkedListDeque<T> {
         return p.item;
     }
 
+    /** Helper function to public getRecursive. */
+    private T getRecursive(Node p, int index) {
+        return index == 0 
+            ? p.item 
+            : index >= size 
+                ? null 
+                : getRecursive(p.next, index - 1);
+    }
+    
+    /** Gets item at index, recursively, where 0 is the front,  
+     * 1 is the next item and so forth. If no such item exists,
+     * returns null. Does not alter deque.
+     * @param index
+     * @return
+    */
+    public T getRecursive(int index) {
+        return getRecursive(sentinel.next, index);
+    }
+
     public static void main(String[] args) {
         LinkedListDeque<String> lld = new LinkedListDeque<String>();
         lld.addFirst("front");
-        lld.printDeque();
+        lld.addFirst("middle");
+        lld.addFirst("middleBack");
+        lld.addFirst("back");
+        System.out.println(lld.getRecursive(0));
     }
 }
