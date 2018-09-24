@@ -1,13 +1,13 @@
 /** Double ended queue implemented with doubly-linked lists
  *
  */
-public class LinkedListDeque<Item> implements Deque<Item>{
+public class LinkedListDeque<T> {
     private class Node {
         Node prev;
-        Item item;
+        T item;
         Node next;
 
-        public Node(Item i, Node p, Node n) {
+        public Node(T i, Node p, Node n) {
             item = i;
             prev = p;
             next = n;
@@ -17,7 +17,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     private Node sentinel;
     private int size;
 
-    public LinkedListDeque(Item i) {
+    public LinkedListDeque(T i) {
         sentinel = new Node(null, null, null);
         sentinel.next = new Node(i, sentinel, sentinel);
         size = 1;
@@ -30,40 +30,35 @@ public class LinkedListDeque<Item> implements Deque<Item>{
         size = 0;
     }
 
-    /** Adds an item of type Item front of deque
+    /** Adds an item of type T front of deque
      * Does not use any looping or recursion. Takes O(1) time.
      * @param item
      */
-    @Override
-    public void addFirst(Item item) {
+    public void addFirst(T item) {
         Node tmp = new Node(item, sentinel, sentinel.next);
         sentinel.next.prev = tmp;
         sentinel.next = tmp;
         size += 1;
     }
 
-    /** Adds an item of Type Item to back of deque.
+    /** Adds an item of Type T to back of deque.
      * Does not use any looping or recusion. Takes O(1) time.
      * @param item
      */
-    @Override
-    public void addLast(Item item) {
+    public void addLast(T item) {
         Node tmp = new Node(item, sentinel.prev, sentinel);
         sentinel.prev.next = tmp;
         sentinel.prev = tmp;
         size += 1;
     }
 
-    @Override
     public boolean isEmpty() { return size == 0; }
 
-    @Override
     public int size() { return size; }
 
     /** Prints the items in the deque from first to last
      * seperated by a space.
      */
-    @Override
     public void printDeque() {
         if (isEmpty()) return;
         Node p = sentinel.next;
@@ -76,10 +71,9 @@ public class LinkedListDeque<Item> implements Deque<Item>{
 
     /** Removes and returns first item at the front of the deque.
      * If no such item exists return null
-     * @return Item item or null
+     * @return T item or null
      */
-    @Override
-    public Item removeFirst() {
+    public T removeFirst() {
         if (isEmpty()) return null;
         Node tmp = sentinel.next;
         sentinel.next = tmp.next;
@@ -90,10 +84,9 @@ public class LinkedListDeque<Item> implements Deque<Item>{
 
     /** Removes and returns first item at back of deque.
      * If no such item exists return null
-     * @return Item item or null
+     * @return T item or null
      */
-    @Override
-    public Item removeLast() {
+    public T removeLast() {
         if (isEmpty()) return null;
         Node tmp = sentinel.prev;
         sentinel.prev = tmp.prev;
@@ -108,8 +101,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
      * @param index
      * @return
      */
-    @Override
-    public Item get(int index) {
+    public T get(int index) {
         if (index > (size - 1)) return null;
         Node p = sentinel.next;
         int count = 0;
@@ -120,7 +112,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     }
 
     /** Helper function to public getRecursive. */
-    private Item getRecursive(Node p, int index) {
+    private T getRecursive(Node p, int index) {
         return index == 0 
             ? p.item 
             : index >= size 
@@ -134,8 +126,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
      * @param index
      * @return
     */
-    @Override
-    public Item getRecursive(int index) {
+    public T getRecursive(int index) {
         return getRecursive(sentinel.next, index);
     }
 
