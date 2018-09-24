@@ -68,6 +68,7 @@ public class ArrayDequeTest {
         }
         while (!A.isEmpty()) {
             A.removeFirst();
+            A.removeLast();
         }
     }
 }
