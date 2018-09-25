@@ -50,7 +50,7 @@ public class ArrayDeque<Item> implements Deque<Item>{
         if (size == items.length) {
             change_capacity(items.length * RFACTOR);
         } 
-        else if ((items.length > MINIMUM_ARRAY_SIZE) & ((double) size / items.length < UFACTOR)) {
+        else if ((items.length > MINIMUM_ARRAY_SIZE) & ((double) size / items.length <= UFACTOR)) {
             change_capacity(items.length / 2);
         }
     }
@@ -81,7 +81,9 @@ public class ArrayDeque<Item> implements Deque<Item>{
     
     @Override
     public Item get(int index) {
-        return null;
+        if (index > (size - 1)) throw new IndexOutOfBoundsException();
+        int adjIndex = (plusOne(nextFirst) + index) % items.length;
+        return items[adjIndex];
     }
 
     @Override

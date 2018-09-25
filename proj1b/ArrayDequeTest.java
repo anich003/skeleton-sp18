@@ -71,4 +71,42 @@ public class ArrayDequeTest {
             A.removeLast();
         }
     }
+
+    @Test
+    public void testGetWithoutResizing() {
+        A.addFirst(0);
+        A.addFirst(1);
+        A.addFirst(2);
+        
+        assertEquals(0, (long) A.get(2));
+        assertEquals(1, (long) A.get(1));
+        assertEquals(2, (long) A.get(0));
+    }
+    
+    @Test
+    public void testGetWithSizingUp() {
+        for (int i = 0; i < 10; i++) {
+            A.addFirst(i);
+        }
+        
+        for (int i = 9; i >= 0; i--) {
+            assertEquals(i, (long) A.get((9-i)));
+        }
+    }
+
+    @Test
+    public void testGetWithSizingUpAndDown() {
+        // Initial resize should cause array to go up to 16...
+        for (int i = 0; i < 10; i++) {
+            A.addFirst(i);
+        }
+        // ..under 4 should cause array to shrink back down to 8
+        while (A.size() > 4) {
+            A.removeFirst();
+        }
+        assertEquals(0, (long) A.get(3));
+        assertEquals(1, (long) A.get(2));
+        assertEquals(2, (long) A.get(1));
+        assertEquals(3, (long) A.get(0));
+    }
 }
