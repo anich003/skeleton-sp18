@@ -86,12 +86,18 @@ public class ArrayDeque<Item> implements Deque<Item>{
         return items[adjIndex];
     }
 
+    /** TODO Fix the null-ization of the trailing element. When removeFirst and removeLast are called
+     * together, such as in Palindrome, and when the two pointers are adjacent in the array, then first call
+     * will null out the value the second call is trying to retrieve.
+     * 
+     * Instead, only the value that is being retrieved should be null (NOT the trailing element)
+     */
     @Override
     public Item removeFirst() {
         if (size == 0) { return null; }
         Item tmp = getFirst();
-        items[nextFirst] = null;
         nextFirst = plusOne(nextFirst);
+        items[nextFirst] = null;
         size -= 1;
         check_capacity_and_resize();
         return tmp;
@@ -101,8 +107,8 @@ public class ArrayDeque<Item> implements Deque<Item>{
     public Item removeLast() {
         if (size == 0) { return null; }
         Item tmp = getLast();
-        items[nextLast] = null;
         nextLast = minusOne(nextLast);
+        items[nextLast] = null;
         size -= 1;
         check_capacity_and_resize();
         return tmp;
@@ -117,10 +123,8 @@ public class ArrayDeque<Item> implements Deque<Item>{
     @Override
     public void printDeque () {
         int count = 0;
-        int i = plusOne(nextFirst);
-        while (count < size()) {
+        for (int i = plusOne(nextFirst); count < size; i = plusOne(i)) {
             System.out.print(items[i] + " ");
-            i = plusOne(i);
             count++;
         }
         System.out.println();

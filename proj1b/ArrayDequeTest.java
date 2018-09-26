@@ -122,4 +122,30 @@ public class ArrayDequeTest {
         assertEquals(2, (long) A.get(1));
         assertEquals(3, (long) A.get(0));
     }
+
+    /** Original implementation of removeFirst and removeLast nulled
+     * the trailing element ie the item before/after the actual item 
+     * being removed. This was because after saving a pointer to the 
+     * desired object, setting the item[i] = null, causes java to set
+     * the desired object to null. The function would then only return
+     * null items. This was written this way to make sure there were
+     * no loitering references to potentially large objects in the 
+     * array.
+     * 
+     * For now (180926) the ArrayDeque now sets items[i] = null which
+     * works fine for primitive types like int, char. We'll have to see
+     * what happens with reference types. Expect those tests to fail.
+     */
+    @Test
+    public void testRemoveFirstAndLastDontInterfere() {
+        String word = "aardvark";
+        ArrayDeque<Character> B = new ArrayDeque<>();
+        for (int i = 0; i < word.length(); i++) {
+            B.addLast(word.charAt(i));
+        }
+        while (A.size() >= 1) {
+            A.removeFirst();
+            A.removeLast();
+        }
+    }
 }

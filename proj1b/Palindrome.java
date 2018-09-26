@@ -15,10 +15,8 @@ public class Palindrome {
 
     private boolean isPalindrome(Deque wordDeque, CharacterComparator cc) {
         if (wordDeque.size() <= 1) { return true; }
-        wordDeque.printDeque();
         char first = (char) wordDeque.removeFirst();
         char last = (char) wordDeque.removeLast();
-        System.out.println("f: " + first + " l: " + last);
         return cc.equalChars(first, last) & isPalindrome(wordDeque, cc);
     }
 
@@ -34,5 +32,8 @@ public class Palindrome {
         Palindrome p = new Palindrome();
         Deque<Character> A = p.wordToDeque("aardvark");
         A.printDeque();
+        while (A.size() > 1) {
+            System.out.println(A.removeFirst() + " " + A.removeLast());
+        }
     }
 }
