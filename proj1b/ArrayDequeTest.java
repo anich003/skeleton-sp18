@@ -73,6 +73,19 @@ public class ArrayDequeTest {
     }
 
     @Test
+    public void testAddUntilFirstResizeThenRemove() {
+        String word = "aardvark";
+        ArrayDeque<Character> B = new ArrayDeque<Character>();
+        for (int i = 0; i < word.length(); i++) {
+            B.addLast(word.charAt(i));
+        }
+        while (A.size() >= 1) {
+            B.removeFirst();
+            B.removeLast();
+        }
+    }
+
+    @Test
     public void testGetWithoutResizing() {
         A.addFirst(0);
         A.addFirst(1);
