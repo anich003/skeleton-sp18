@@ -41,7 +41,7 @@ public class TestArrayRingBuffer {
         arb.enqueue(1);
         arb.enqueue(2);
         arb.enqueue(3);
-        arb.enqueue(4); // should throw excpetion
+        arb.enqueue(4); // should throw exception
     }
 
     @Test
@@ -53,6 +53,14 @@ public class TestArrayRingBuffer {
         for (int j = 0; j < 100; j++) {
             arb.enqueue(arb.dequeue());
         }
+    }
+
+    @Test
+    public void testGuitarStringLikeInstantiation() {
+        int SR = 44100; // Sampling rate
+        double CONCERT_A = 440.0;
+        int capacity = (int) Math.round(SR / CONCERT_A);
+        BoundedQueue<Double> buffer = new ArrayRingBuffer<>(capacity);
     }
 
     /** Calls tests for ArrayRingBuffer.  

@@ -15,9 +15,6 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
     public ArrayRingBuffer(int capacity) {
         this.capacity = capacity;
         rb = (T[]) new Object[capacity];
-
-        System.out.println("Creating rb with capacity: " + capacity);
-
         first = 0;
         last = 0;
         fillCount = 0;
@@ -35,7 +32,6 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
         return newDex >= 0 ? newDex : capacity - 1;
     }
 
-
     /**
      * Adds x to the end of the ring buffer. If there is no room, then
      * throw new RuntimeException("Ring buffer overflow"). Exceptions
@@ -44,7 +40,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
     public void enqueue(T x) {
         if (isFull()) { throw new RuntimeException("Ring buffer overflow"); }
         rb[last] = x;
-        last += plusOne(last);
+        last = plusOne(last);
         fillCount += 1;
     }
 
@@ -56,7 +52,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
     public T dequeue() {
         if (isEmpty()) { throw new RuntimeException("Cannot dequeue from empty RingBuffer"); }
         T tmp = rb[first];
-        first += plusOne(first);
+        first = plusOne(first);
         fillCount -= 1;
         return tmp;
     }
