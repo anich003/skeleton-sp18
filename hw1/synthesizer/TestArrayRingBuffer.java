@@ -15,9 +15,44 @@ public class TestArrayRingBuffer {
     }
 
     @Test
-    public void TestEnqueueOneItem() {
+    public void testEnqueueOneItem() {
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
         arb.enqueue(5);
+    }
+
+    @Test
+    public void testEnqueueAndDeque() {
+        ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
+        arb.enqueue(5);
+        int expected = 5;
+        assertEquals((Integer) 5, arb.dequeue());
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void testDequeueEmptyThrowsError() {
+        ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
+        arb.dequeue();
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void testEnqueueFullThrowsError() {
+        ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
+        arb.enqueue(0);
+        arb.enqueue(1);
+        arb.enqueue(2);
+        arb.enqueue(3);
+        arb.enqueue(4); // should throw excpetion
+    }
+
+    @Test
+    public void testCanEnqueueDequeue() {
+        ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
+        for (int i = 0; i < 4; i++) {
+            arb.enqueue(i);
+        }
+        for (int j = 0; j < 100; j++) {
+            arb.enqueue(arb.dequeue());
+        }
     }
 
     /** Calls tests for ArrayRingBuffer.  
