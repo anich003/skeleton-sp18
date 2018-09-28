@@ -25,7 +25,7 @@ public class TestArrayRingBuffer {
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
         arb.enqueue(5);
         int expected = 5;
-        assertEquals((Integer) 5, arb.dequeue());
+        assertEquals((Integer) expected, arb.dequeue());
     }
 
     @Test(expected=RuntimeException.class)
@@ -53,6 +53,17 @@ public class TestArrayRingBuffer {
         for (int j = 0; j < 100; j++) {
             arb.enqueue(arb.dequeue());
         }
+    }
+
+    @Test
+    public void testCanEnqueueUntilFull() {
+        ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
+        while (!arb.isFull()) {
+            arb.enqueue(0);
+        }
+        int expected = 4;
+        assertEquals((Integer) expected, (Integer) arb.fillCount());
+        assertTrue(arb.isFull());
     }
 
     /** Calls tests for ArrayRingBuffer.  
