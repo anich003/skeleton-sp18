@@ -1,0 +1,3 @@
+javac synthesizer/*.java
+
+java -cp packagedir pkgname.className

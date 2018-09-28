@@ -1,5 +1,4 @@
 package synthesizer;
-
 import java.util.Iterator;
 
 public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
@@ -25,16 +24,28 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
         fillCount = 0;
     }
 
+    /** Helper methods that moves an index around a cyclic array.
+     *
+     */
+    private int plusOne(int dex) {
+        int newDex = dex + 1;
+        return newDex <= capacity - 1 ? newDex : 0;
+    }
+    private int minusOne(int dex) {
+        int newDex = dex - 1;
+        return newDex >= 0 ? newDex : capacity - 1;
+    }
+
+
     /**
      * Adds x to the end of the ring buffer. If there is no room, then
      * throw new RuntimeException("Ring buffer overflow"). Exceptions
      * covered Monday.
      */
     public void enqueue(T x) {
-        // TODO: Enqueue the item. Don't forget to increase fillCount and update last.
         if (isFull()) { throw new RuntimeException("Ring buffer overflow"); }
         rb[last] = x;
-        last += 1;
+        last += plusOne(last);
         fillCount += 1;
     }
 
@@ -44,21 +55,26 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
      * covered Monday.
      */
     public T dequeue() {
-        // TODO: Dequeue the first item. Don't forget to decrease fillCount and update 
-        return null;
+        if (isEmpty()) { throw new RuntimeException("Cannot dequeue from empty RingBuffer"); }
+        T tmp = rb[first];
+        first += plusOne(first);
+        fillCount -= 1;
+        return tmp;
     }
 
     /**
      * Return oldest item, but don't remove it.
      */
     public T peek() {
-        // TODO: Return the first item. None of your instance variables should change.
-        return null;
+        return rb[first];
     }
 
     // TODO: When you get to part 5, implement the needed code to support iteration.
+
     public static void main(String[] args) {
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
         arb.enqueue(5);
+        System.out.println(arb.peek());
+        System.out.println(arb.dequeue());
     }
 }

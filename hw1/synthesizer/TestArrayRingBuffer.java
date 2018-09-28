@@ -16,11 +16,11 @@ public class TestArrayRingBuffer {
 
     @Test
     public void TestEnqueueOneItem() {
-        //ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
-        //arb.enqueue(5);
+        ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
+        arb.enqueue(5);
     }
 
-    /** Calls tests for ArrayRingBuffer. 
+    /** Calls tests for ArrayRingBuffer.  
     public static void main(String[] args) {
         //jh61b.junit.textui.runClasses(TestArrayRingBuffer.class);
     }
