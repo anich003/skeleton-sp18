@@ -64,12 +64,39 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
         return rb[first];
     }
 
-    // TODO: When you get to part 5, implement the needed code to support iteration.
+    private class KeyIterator implements Iterator {
+        private int ptr;
+        private int cnt;
+
+        public KeyIterator() {
+            ptr = first;
+            cnt = 0;
+        }
+
+        public boolean hasNext() {
+            return cnt < fillCount();
+        }
+
+        public T next() {
+            T tmp = rb[ptr];
+            ptr = plusOne(ptr);
+            cnt += 1;
+            return tmp;
+        }
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new KeyIterator();
+    }
 
     public static void main(String[] args) {
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
-        arb.enqueue(5);
-        System.out.println(arb.peek());
-        System.out.println(arb.dequeue());
+        for (int i = 0; i < 4; i++) {
+            arb.enqueue(i);
+        }
+        for (int j : arb) {
+            System.out.println(j);
+        }
     }
 }
