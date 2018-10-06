@@ -7,15 +7,30 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 import java.util.Random;
+import java.util.*;
 
 /**
  * Draws a world consisting of hexagonal regions.
  */
 public class HexWorld {
+    private static final int WIDTH = 80;
+    private static final int HEIGHT = 40;
+
+    private static final Random RANDOM = new Random();
+
     private static int calculateBboxSize(int hex_sides) {
         return hex_sides == 1 ? 3 : 3 * hex_sides - 2;
     }
 
+    private static TETile randomTile() {
+        int tile_num = RANDOM.nextInt(3);
+        switch (tile_num) {
+            case 0: return Tileset.WATER;
+            case 1: return Tileset.SAND;
+            case 2: return Tileset.FLOWER;
+            default: return Tileset.MOUNTAIN;
+        }
+    }
 
     /** Adds hexagon to world with top edge at top and left edge at left.
      * @param world 2D array of TETiles to which hexagon will be added
@@ -53,8 +68,10 @@ public class HexWorld {
         }
     }
 
-    private static final int WIDTH = 60;
-    private static final int HEIGHT = 30;
+    public static void addHexagon(TETile[][] world, Hexagon hexagon) {
+        addHexagon(world, hexagon.tile(), hexagon.xmin(), hexagon.ymin(), hexagon.size());
+    }
+
 
     public static void main(String[] args) {
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
@@ -69,9 +86,32 @@ public class HexWorld {
             }
         }
 
-        addHexagon(world, Tileset.FLOWER, 0, 0, 6);
-        addHexagon(world, Tileset.GRASS, 12 - 1, 6, 6);
-        addHexagon(world, Tileset.MOUNTAIN, 24 - 2, 0, 6);
+        Queue<Hexagon> hexQueue = new LinkedList<>();
+
+        Hexagon seedHex = new Hexagon(3, 15, 0, Tileset.MOUNTAIN);
+        hexQueue.add(seedHex);
+
+        while (!hexQueue.isEmpty()) {
+            seedHex = hexQueue.remove();
+            addHexagon(world, seedHex);
+            Hexagon L = seedHex.grow_left_up(randomTile());
+            Hexagon R = seedHex.grow_right_up(randomTile());
+
+            try {
+                addHexagon(world, L);
+                hexQueue.add(L);
+            } catch (Exception e) {
+                System.out.println("Skipping Hexagon");
+            }
+
+            try {
+                addHexagon(world, R);
+                hexQueue.add(R);
+            } catch (Exception e) {
+                System.out.println("Skipping Hexagon");
+            }
+
+        }
 
         // draws the world to the screen
         ter.renderFrame(world);
@@ -90,4 +130,6 @@ public class HexWorld {
         testBboxKnownVsExpected(3, 7);
         testBboxKnownVsExpected(6,16);
     }
+
+
 }
