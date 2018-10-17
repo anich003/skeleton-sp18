@@ -33,16 +33,26 @@ public class MapGenerator {
         Room r = new Room(x, y, roomWidth, roomHeight);
         r.addTo(map);
 
-
         r = new Room(10, 10, 7, 9, Direction.Right);
         r.addTo(map);
         map[10][10] = Tileset.FLOWER;
 
         map[13][14] = Tileset.FLOWER;
         r = new Room(13, 14, 5, 11, Direction.Up);
-        r.addTo(map);
+        if (r.isValid(map)) {
+            // Should be valid
+            r.addTo(map);
+        }
 
         map[13][14] = Tileset.FLOOR;
+
+        r = new Room(2, 2, 5, 5, Direction.Down);
+        if (r.isValid(map)) {
+            // should fail
+            r.addTo(map);
+        } else {
+            System.out.println("Skipping: " + r);
+        }
 
         return map;
     }
@@ -118,6 +128,29 @@ public class MapGenerator {
                     }
                 }
             }
+        }
+
+        public boolean isValid(TETile[][] map) {
+            int map_width = map.length;
+            int map_height = map[0].length;
+
+            // check if xmin and ymin are in the map
+            if (xmin < 0 || ymin < 0) { return false; }
+            if (xmin + width > map_width || ymin + height > map_height) { return false; }
+
+            // check if any room tiles land on existing floor tiles
+            for (int x = 0; x < width; x += 1) {
+                for (int y = 0; y < height; y += 1) {
+                    if (map[x + xmin][y + ymin] == Tileset.FLOOR) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public String toString() {
+            return "Room(" + xmin + ", " + ymin + ", " + width + ", " + height + ")";
         }
     }
 
