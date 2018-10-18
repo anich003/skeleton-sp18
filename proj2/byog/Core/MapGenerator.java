@@ -4,7 +4,7 @@ import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-import java.util.Map;
+import java.awt.Color;
 import java.util.Random;
 
 public class MapGenerator {
@@ -21,37 +21,46 @@ public class MapGenerator {
         RNG = new Random(seed);
     }
 
-    public TETile[][] generateRandomMap(int width, int height) {
+     public TETile[][] generateRandomMap(int width, int height) {
         TETile[][] map = initializeMap(width, height);
 
-        map[width/2][height/2] = Tileset.FLOWER;
-        int roomWidth = 10;
-        int roomHeight = 8;
-        int x = getRoomLowerBound(width/2, roomWidth);
-        int y = getRoomLowerBound(height/2, roomHeight);
 
-        Room r = new Room(x, y, roomWidth, roomHeight);
-        r.addTo(map);
+         // Build map in center of room as a starting point
+         map[width/2][height/2] = Tileset.FLOWER;
+         int roomWidth = 10;
+         int roomHeight = 8;
+         int xmin = getRoomLowerBound(width/2, roomWidth);
+         int ymin = getRoomLowerBound(height/2, roomHeight);
+         Room r = new Room(xmin, ymin, roomWidth, roomHeight);
+         r.addTo(map);
 
-        r = new Room(10, 10, 7, 9, Direction.Right);
-        r.addTo(map);
-        map[10][10] = Tileset.FLOWER;
+         int numberOfFeatures = 1;
 
-        map[13][14] = Tileset.FLOWER;
-        r = new Room(13, 14, 5, 11, Direction.Up);
-        if (r.isValid(map)) {
-            // Should be valid
-            r.addTo(map);
-        }
+         // Initialize variables to appease compiler gods but if not defined by
+        // feature building step, then won't be used on this iteration of numberOfAttempts
+        int newx = 0;
+        int newy = 0;
+        Direction d = null;
 
-        map[13][14] = Tileset.FLOOR;
+        // TODO Number of attempts should scale with size of map
+        for (int numberOfAttempts = 0; numberOfAttempts < 1000; numberOfAttempts += 1) {
 
-        r = new Room(2, 2, 5, 5, Direction.Down);
-        if (r.isValid(map)) {
-            // should fail
-            r.addTo(map);
-        } else {
-            System.out.println("Skipping: " + r);
+            // Find a random wall and normal direction in 1000 attempts
+            for (int wallAttempts = 0; wallAttempts < 1000; wallAttempts += 1) {
+                newx = RandomUtils.uniform(RNG, 1, width - 1);
+                newy = RandomUtils.uniform(RNG, 1, height - 1);
+
+                if (getTile(map, newx, newy) != Tileset.WALL) {
+                    continue;
+                }
+
+                d = getNormalDirection(map, newx, newy);
+
+                if (d != null && numberOfFeatures < 20) {
+                    buildRandomFeature(map, newx, newy, d);
+                    numberOfFeatures += 1;
+                }
+            }
         }
 
         return map;
@@ -75,6 +84,92 @@ public class MapGenerator {
 
     private int getRoomUpperBound(int center, int length) {
         return center + (length + 1) / 2;
+    }
+
+    private TETile getTile(TETile[][] map, int xCoord, int yCoord) {
+        return map[xCoord][yCoord];
+    }
+
+    /** Returns the outward Direction from a given wall, or null if unable to calculate */
+    private Direction getNormalDirection(TETile[][] map, int xCoord, int yCoord) {
+        try {
+            if (map[xCoord][yCoord - 1] == Tileset.FLOOR) {
+                return Direction.Up;
+            } else if (map[xCoord][yCoord + 1] == Tileset.FLOOR) {
+                return Direction.Down;
+            } else if (map[xCoord - 1][yCoord] == Tileset.FLOOR) {
+                return Direction.Right;
+            } else if (map[xCoord + 1][yCoord] == Tileset.FLOOR) {
+                return Direction.Left;
+            } else {
+                return null;
+            }
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Wall is too close to border. Skipping");
+            return null;
+        }
+    }
+
+    private void buildRandomFeature(TETile[][] map, int xCoord, int yCoord, Direction d) {
+        final int ChanceRoom = 40;
+        Room r = null;
+
+        // Build either a random room or a random hallway
+        int feature = RandomUtils.uniform(RNG, 0, 100);
+        if (feature <= ChanceRoom) {
+            int randomWidth = 4;
+            int randomHeight = 4;
+
+            for (int roomAttempts = 0; roomAttempts < 100; roomAttempts += 1) {
+                randomWidth = RandomUtils.uniform(RNG, 4, 15);
+                randomHeight = RandomUtils.uniform(RNG, 4, 10);
+                r = new Room(xCoord, yCoord, randomWidth, randomHeight, d);
+                if (r.isValid(map)) {
+                    r.addTo(map);
+                    connectFeatures(map, xCoord, yCoord, d);
+                    break;
+                }
+            }
+        } else {
+            // Build a random hallway
+            int randomLength = 3;
+            // Hallways are essentially Rooms with pre-known width or height
+            for (int hallwayAttempts = 0; hallwayAttempts < 100; hallwayAttempts += 1) {
+                randomLength = RandomUtils.uniform(RNG, 5, 15);
+                if (d == Direction.Up || d == Direction.Down) {
+                    r = new Room(xCoord, yCoord, 3, randomLength, d);
+                } else if (d == Direction.Left || d == Direction.Right) {
+                    r = new Room(xCoord, yCoord, randomLength, 3, d);
+                }
+
+                if (r.isValid(map)) {
+                    r.addTo(map);
+                    connectFeatures(map, xCoord, yCoord, d);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void connectFeatures(TETile[][] map, int xCoord, int yCoord, Direction d) {
+        int xmod = 0;
+        int ymod = 0;
+
+        switch (d) {
+            case Up:
+                xmod =  0; ymod =  1; break;
+            case Down:
+                xmod =  0; ymod = -1; break;
+            case Left:
+                xmod = -1; ymod =  0; break;
+            case Right:
+                xmod =  1; ymod =  0; break;
+            default:
+                throw new RuntimeException("Error connecting features");
+        }
+
+        map[xCoord][yCoord] = Tileset.FLOOR;
+        map[xCoord + xmod][yCoord + ymod] = Tileset.FLOOR;
     }
 
     private class Room {
@@ -136,6 +231,7 @@ public class MapGenerator {
 
             // check if xmin and ymin are in the map
             if (xmin < 0 || ymin < 0) { return false; }
+            // check if xmax and ymax are within map bounds
             if (xmin + width > map_width || ymin + height > map_height) { return false; }
 
             // check if any room tiles land on existing floor tiles
@@ -156,7 +252,7 @@ public class MapGenerator {
 
     public static void main(String[] args) {
         int width = 80;
-        int height = 30;
+        int height = 50;
         MapGenerator mg = new MapGenerator(1234);
         TETile[][] map = mg.generateRandomMap(width, height);
 
