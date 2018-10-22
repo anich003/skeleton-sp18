@@ -24,7 +24,6 @@ public class MapGenerator {
      public TETile[][] generateRandomMap(int width, int height) {
         TETile[][] map = initializeMap(width, height);
 
-
          // Build map in center of room as a starting point
          map[width/2][height/2] = Tileset.FLOWER;
          int roomWidth = 10;
@@ -56,7 +55,7 @@ public class MapGenerator {
 
                 d = getNormalDirection(map, newx, newy);
 
-                if (d != null && numberOfFeatures < 20) {
+                if (d != null && numberOfFeatures < 60) {
                     buildRandomFeature(map, newx, newy, d);
                     numberOfFeatures += 1;
                 }
@@ -111,7 +110,7 @@ public class MapGenerator {
     }
 
     private void buildRandomFeature(TETile[][] map, int xCoord, int yCoord, Direction d) {
-        final int ChanceRoom = 40;
+        final int ChanceRoom = 70;
         Room r = null;
 
         // Build either a random room or a random hallway
@@ -252,7 +251,7 @@ public class MapGenerator {
 
     public static void main(String[] args) {
         int width = 80;
-        int height = 50;
+        int height = 30;
         MapGenerator mg = new MapGenerator(1234);
         TETile[][] map = mg.generateRandomMap(width, height);
 
