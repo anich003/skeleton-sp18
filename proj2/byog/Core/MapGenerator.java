@@ -10,6 +10,7 @@ import java.util.Random;
 public class MapGenerator {
     private long seed;
     private Random RNG;
+    private int numberOfFeatures;
 
     public MapGenerator() {
         seed = System.currentTimeMillis();
@@ -33,7 +34,7 @@ public class MapGenerator {
          Room r = new Room(xmin, ymin, roomWidth, roomHeight);
          r.addTo(map);
 
-         int numberOfFeatures = 1;
+        numberOfFeatures = 1;
 
          // Initialize variables to appease compiler gods but if not defined by
         // feature building step, then won't be used on this iteration of numberOfAttempts
@@ -49,16 +50,23 @@ public class MapGenerator {
                 newx = RandomUtils.uniform(RNG, 1, width - 1);
                 newy = RandomUtils.uniform(RNG, 1, height - 1);
 
-                if (getTile(map, newx, newy) != Tileset.WALL) {
-                    continue;
-                }
+                if (getTile(map, newx, newy) != Tileset.WALL) { continue; }
 
                 d = getNormalDirection(map, newx, newy);
 
-                if (d != null && numberOfFeatures < 60) {
+                if (d != null && numberOfFeatures < 20) {
                     buildRandomFeature(map, newx, newy, d);
-                    numberOfFeatures += 1;
                 }
+            }
+        }
+
+        // Find random wall and placed a locked door there
+        while (true) {
+            int lockedDoorX = RandomUtils.uniform(RNG, 1, width - 1);
+            int lockedDoorY = RandomUtils.uniform(RNG, 1, height -1);
+            if (getTile(map, lockedDoorX, lockedDoorY) == Tileset.WALL) {
+                map[lockedDoorX][lockedDoorY] = Tileset.LOCKED_DOOR;
+                break;
             }
         }
 
@@ -126,6 +134,7 @@ public class MapGenerator {
                 if (r.isValid(map)) {
                     r.addTo(map);
                     connectFeatures(map, xCoord, yCoord, d);
+                    numberOfFeatures += 1;
                     break;
                 }
             }
@@ -140,16 +149,17 @@ public class MapGenerator {
                 } else if (d == Direction.Left || d == Direction.Right) {
                     r = new Room(xCoord, yCoord, randomLength, 3, d);
                 }
-
                 if (r.isValid(map)) {
                     r.addTo(map);
                     connectFeatures(map, xCoord, yCoord, d);
+                    numberOfFeatures += 1;
                     break;
                 }
             }
         }
     }
 
+    /** After drawing a connecting room or wall, sets the two connecting tiles to Tileset.FLOOR */
     private void connectFeatures(TETile[][] map, int xCoord, int yCoord, Direction d) {
         int xmod = 0;
         int ymod = 0;
